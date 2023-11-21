@@ -1,0 +1,527 @@
+=================================================================================================================
+🔶🔸개발환경🔸🔶			pp.20 ~ 36
+=================================================================================================================
+[VMware Player 설치]
+https://www.vmware.com/kr/products/workstation-player/workstation-player-evaluation.html
+여기에서 17.0. 버전을 다운로드 및 설치함
+
+[ubuntu 22.04 설치]
+https://releases.ubuntu.com/22.04/
+
+[SSH Server 설치]
+terminal =>
+$ sudo apt install openssh-server
+   
+[IP 확인]
+$ ip a
+
+[mobaxterm 설치]
+https://mobaxterm.mobatek.net/download-home-edition.html
+
+[mobaxterm접속]
+=================================================================================================================
+🔶🔸Minikube 배포🔸🔶			pp.38 ~ 49
+=================================================================================================================
+[📍사전 패키지 업데이트 및 툴 설치]
+$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install curl
+$ sudo apt install vim
+$ sudo apt install git
+
+[📍Minikube 설치]
+$ cd ~
+$ wget https://github.com/kubernetes/minikube/releases/download/v1.23.0/minikube-linux-amd64
+$ sudo cp minikube-linux-amd64 /usr/local/bin/minikube
+$ sudo install minikube-linux-amd64 /usr/local/bin/minikube
+$ minikube version
+
+[📍kubectl 설치]
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.1/bin/linux/amd64/kubectl
+$ chmod +x ./kubectl
+$ sudo mv ./kubectl /usr/local/bin/kubectl
+$ kubectl version -o json  --client
+
+[📍Kubic Project 저장소 등록]
+$ curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_21.10/Release.key \
+  | gpg --dearmor \
+  | sudo tee /etc/apt/keyrings/devel_kubic_libcontainers_stable.gpg > /dev/null
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/devel_kubic_libcontainers_stable.gpg] \
+    https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_21.10/ /" \
+  | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list > /dev/null
+
+$ sudo apt-get update
+$ sudo apt-get -y upgrade
+
+[📍Podman 설치]
+$ sudo apt-get -y install podman
+$ sudo vim /etc/sudoers
+예시) ubuntu ALL=(ALL) NOPASSWD: /usr/bin/podman
+$ sudo -k -n podman version
+
+=================================================================================================================
+🔶🔸MSA Application 배포🔸🔶			pp.51 ~ 73 
+=================================================================================================================
+
+[📍Minikube 실행]
+$ minikube start --driver=podman --container-runtime=cri-o
+
+[📍Minikube 배포 확인]
+$ kubectl get node
+$ kubectl get pods -n kube-system
+
+[📍배포 파일 다운로드]
+$ cd ~
+$ git clone https://github.com/K-PaaS/edu-msa-file.git
+
+[📍Minikube IP 주소 조회]
+$ minikube ip 
+
+[📍redis-msa-ui.yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/redis-msa-ui.yaml
+${REDIS_MSA_UI}를 "30801"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-msa-ui
+  labels:
+    app: redis
+spec:
+  ports:
+  - nodePort: 30801
+    port: 6379
+    protocol: TCP
+    targetPort: 6379
+  selector:
+    app: redis
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+[📍레디스 배포]
+$ cd ~/edu-msa-file/Kubernetes/
+$ kubectl apply -f redis-msa-ui.yaml
+
+
+
+[📍mysql-msa-board.yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/mysql-msa-board.yaml
+${MYSQL_MSA_BOARD}을 "30501"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-msa-board
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+    nodePort: 30501
+  selector:
+    app: mysql-board
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+
+
+[📍mysql-msa-comment.yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/mysql-msa-comment.yaml
+${MYSQL_MSA_COMMENT}을 "30601"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-msa-comment
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+    nodePort: 30601
+  selector:
+    app: mysql-comment
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+
+[📍mysql-msa-user.yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/mysql-msa-user.yaml
+${MYSQL_MSA_USER}을 "30701"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-msa-user
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+    nodePort: 30701
+  selector:
+    app: mysql-user
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+=================================================================================================================
+🔶🔸MySql 배포 및 DB 구축🔸🔶			pp.62 ~ 73 
+=================================================================================================================
+
+
+[📍mysql 배포]
+$ cd ~/edu-msa-file/Kubernetes/
+$ kubectl apply -f mysql-msa-board.yaml -f mysql-msa-comment.yaml -f mysql-msa-user.yaml
+
+
+[📍배포 확인]
+$ kubectl get pods
+#아래 파드 조회 내용은 교육생마다 이름이 다르므로 예시로 참고 하시기 바랍니다.
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+NAME                                             READY   STATUS    RESTARTS   AGE
+mysql-msa-board-85bb55fb4f-gpj9f         1/1      Running    0              3m4s
+mysql-msa-comment-694d68d4ff-562wk   1/1      Running    0              3m4s
+mysql-msa-user-6c5499bbb5-29skb         1/1      Running    0              3m4s
+redis-msa-ui-7d95f7d758-nmb2z             1/1      Running    0              14m
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+[📍Board DB 접속]
+# kubectl exec -it ${POD_NAME} -- /bin/bash  
+#조회한 파드의 이름을 아래와 같이 입력하시면 됩니다.
+예시) $ kubectl exec -it mysql-msa-board-85bb55fb4f-gpj9f -- /bin/bash
+
+
+[📍Board DB 로그인]
+# mysql -u root -p
+Enter password: password
+
+[📍Board DB 생성 및 테이블 생성]
+mysql> CREATE DATABASE msa_board default CHARACTER SET UTF8;
+mysql> USE msa_board;
+mysql> CREATE TABLE `TB_BOARD` (
+  `board_seq` int(11) NOT NULL AUTO_INCREMENT,
+  `board_title` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `board_text` mediumtext COLLATE utf8_unicode_ci,
+  `write_user_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `write_user_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `use_yn` varchar(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `create_dt` datetime NOT NULL,
+  `update_dt` datetime NOT NULL,
+  PRIMARY KEY (`board_seq`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+> exit
+# exit
+
+
+[📍배포 확인]
+$ kubectl get pods 
+#아래 파드 조회 내용은 교육생마다 이름이 다르므로 예시로 참고 하시기 바랍니다.
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+NAME                                             READY   STATUS    RESTARTS   AGE
+mysql-msa-board-85bb55fb4f-gpj9f         1/1      Running    0              3m4s
+mysql-msa-comment-694d68d4ff-562wk   1/1      Running    0              3m4s
+mysql-msa-user-6c5499bbb5-29skb         1/1      Running    0              3m4s
+redis-msa-ui-7d95f7d758-nmb2z             1/1      Running    0              14m
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+[📍COMMENT DB 접속]
+# kubectl exec -it ${POD_NAME} -- /bin/bash  
+#조회한 파드의 이름을 아래와 같이 입력하시면 됩니다.
+예시) $ kubectl exec -it mysql-msa-comment-694d68d4ff-562wk -- /bin/bash
+
+
+[📍COMMENT DB 로그인]
+# mysql -u root -p
+Enter password: password
+
+[📍COMMENT DB 생성 및 테이블 생성]
+mysql> CREATE DATABASE msa_comment default CHARACTER SET UTF8;
+mysql> USE msa_comment;
+mysql> CREATE TABLE `TB_COMMENT` (
+  `comment_seq` int(11) NOT NULL AUTO_INCREMENT,
+  `board_seq` int(11) NOT NULL,
+  `comment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `write_user_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `write_user_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `use_yn` varchar(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `create_dt` datetime NOT NULL,
+  `update_dt` datetime NOT NULL,
+  PRIMARY KEY (`comment_seq`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+> exit
+# exit
+
+
+[📍배포 확인]
+$ kubectl get pods 
+#아래 파드 조회 내용은 교육생마다 이름이 다르므로 예시로 참고 하시기 바랍니다.
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+NAME                                             READY   STATUS    RESTARTS   AGE
+mysql-msa-board-85bb55fb4f-gpj9f         1/1      Running    0              3m4s
+mysql-msa-comment-694d68d4ff-562wk   1/1      Running    0              3m4s
+mysql-msa-user-6c5499bbb5-29skb         1/1      Running    0              3m4s
+redis-msa-ui-7d95f7d758-nmb2z             1/1      Running    0              14m
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+[📍USER DB 접속]
+# kubectl exec -it ${POD_NAME} -- /bin/bash  
+#조회한 파드의 이름을 아래와 같이 입력하시면 됩니다.
+예시) $ kubectl exec -it mysql-msa-user-6c5499bbb5-29skb -- /bin/bash
+
+
+[📍USER DB 로그인]
+# mysql -u root -p
+Enter password: password
+
+[📍USER DB 생성 및 테이블 생성]
+mysql> CREATE DATABASE msa_user default CHARACTER SET UTF8;
+mysql> USE msa_user;
+mysql> CREATE TABLE `TB_USER` (
+  `user_seq` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `user_passwd` varchar(256) COLLATE utf8_unicode_ci NOT NULL,
+  `user_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `use_yn` varchar(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `create_dt` datetime NOT NULL,
+  `update_dt` datetime NOT NULL,
+  PRIMARY KEY (`user_seq`),
+  UNIQUE KEY `id_key` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+> exit
+# exit
+
+[JDK8 다운로드]
+https://www.oracle.com/java/technologies/downloads/#java8-windows
+
+
+=================================================================================================================
+🔶🔸YAML 파일 수정🔸🔶			pp.105 ~ 115
+=================================================================================================================
+
+[eGovFrameDev 다운로드]
+https://www.egovframe.go.kr/home/ntt/nttRead.do?menuNo=41&bbsId=18&nttId=1707&leftsub=2
+
+[파일 다운로드]
+https://github.com/K-PaaS?q=edu&type=all&language=&sort=
+
+[📍이미지 저장소 로그인]
+$ podman login docker.io
+Username: 아이디 입력
+Password: 패스워드 입력
+
+[📍이미지 빌드, 태그, 업로드]
+$ cd ~/edu-msa-file/Docker/edu-msa-board/ 
+$ podman build --tag edu-msa-board:latest .
+$ podman tag edu-msa-board parkdoll/edu-msa-board
+$ podman push parkdoll/edu-msa-board
+
+$ cd ~/edu-msa-file/Docker/edu-msa-comment/ 
+$ podman build --tag edu-msa-comment:latest .
+$ podman tag edu-msa-comment parkdoll/edu-msa-comment
+$ podman push parkdoll/edu-msa-comment
+
+$ cd ~/edu-msa-file/Docker/edu-msa-ui/ 
+$ podman build --tag edu-msa-ui:latest .
+$ podman tag edu-msa-ui parkdoll/edu-msa-ui
+$ podman push parkdoll/edu-msa-ui
+
+$ cd ~/edu-msa-file/Docker/edu-msa-user/ 
+$ podman build --tag edu-msa-user:latest .
+$ podman tag edu-msa-user parkdoll/edu-msa-user
+$ podman push parkdoll/edu-msa-user
+
+$ cd ~/edu-msa-file/Docker/edu-msa-zuul/ 
+$ podman build --tag edu-msa-zuul:latest .
+$ podman tag edu-msa-zuul parkdoll/edu-msa-zuul
+$ podman push parkdoll/edu-msa-zuul
+
+[📍edu-msa-board yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/edu-msa-board.yaml
+${DOCKER_HUB_ID}을 "도커허브계정"로 입력
+${EDU_MSA_BOARD}을 "30201"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+...
+spec:
+      containers:
+      - name: board-msa
+        image: kpaas/edu-msa-board:latest
+        imagePullPolicy: Always
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-msa-board
+  labels:
+    app: board-msa
+spec:
+  ports:
+  - nodePort:
+    port: 28082
+    protocol: TCP
+    targetPort: 28082
+  selector:
+    app: board-msa
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+
+[📍edu-msa-comment yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/edu-msa-comment.yaml
+${DOCKER_HUB_ID}을 "도커허브계정"로 입력
+${EDU_MSA_COMMENT}을 "30301"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+...
+spec:
+      containers:
+      - name: board-msa
+        image: kpaas/edu-msa-board:latest
+        imagePullPolicy: Always
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-msa-comment
+  labels:
+    app: comment-msa
+spec:
+  ports:
+  - nodePort: 30301
+    port: 28083
+    protocol: TCP
+    targetPort: 28083
+  selector:
+    app: comment-msa
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+
+[📍edu-msa-ui yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/edu-msa-ui.yaml
+${DOCKER_HUB_ID}을 "도커허브계정"로 입력
+${EDU_MSA_UI}을 "30001"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+...
+spec:
+      containers:
+      - name: board-msa
+        image: kpaas/edu-msa-board:latest
+        imagePullPolicy: Always
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-msa-ui
+  labels:
+    app: ui-msa
+spec:
+  ports:
+  - nodePort: 30001
+    port: 28080
+    protocol: TCP
+    targetPort: 28080
+  selector:
+    app: ui-msa
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+[📍edu-msa-user yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/edu-msa-user.yaml
+${DOCKER_HUB_ID}을 "도커허브계정"로 입력
+${EDU_MSA_USER}을 "30401"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+...
+spec:
+      containers:
+      - name: board-msa
+        image: kpaas/edu-msa-board:latest
+        imagePullPolicy: Always
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-msa-user
+  labels:
+    app: user-msa
+spec:
+  ports:
+  - nodePort: 30401
+    port: 28084
+    protocol: TCP
+    targetPort: 28084
+  selector:
+    app: user-msa
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+[📍edu-msa-zuul yaml 파일 수정]
+$ vim ~/edu-msa-file/Kubernetes/edu-msa-zuul.yaml
+${DOCKER_HUB_ID}을 "도커허브계정"로 입력
+${NAMESPACE}을 "default"로 입력 (총 3줄)
+${EDU_MSA_ZULL}을 "30101"로 수정
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Example ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+...
+spec:
+      containers:
+      - name: zuul-msa
+        image: jinyung0101/edu-msa-zuul:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 28081
+        env:
+        - name: BOARD_MSA_URL
+          value: "edu-msa-board.default.svc.cluster.local:28082"
+        - name: COMMENT_MSA_URL
+          value: "edu-msa-comment.default.svc.cluster.local:28083"
+        - name: USER_MSA_URL
+          value: "edu-msa-user.default.svc.cluster.local:28084"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-msa-zuul
+  labels:
+    app: zuul-msa
+spec:
+  ports:
+  - nodePort: 30101
+    port: 28081
+    protocol: TCP
+    targetPort: 28081
+  selector:
+    app: zuul-msa
+  type: NodePort
+🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
+
+[📍yaml 파일 배포]
+$ cd ~/edu-msa-file/Kubernetes/
+$ kubectl apply -f edu-msa-board.yaml -f edu-msa-comment.yaml -f edu-msa-ui.yaml -f edu-msa-user.yaml -f edu-msa-zuul.yaml
+
+[📍Pod 및 Service 배포 확인]
+$ kubectl get pods
+$ kubectl get service
+
+=================================================================================================================
+🔶🔸MSA Application 포털 접속🔸🔶			pp.116
+=================================================================================================================
+#VMware 화면 웹브라우저 화면에서 아래 링크 입력하여 접속한다.
+192.168.49.2:30001/user/login

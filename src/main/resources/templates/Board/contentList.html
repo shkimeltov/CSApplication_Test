@@ -1,0 +1,75 @@
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout" >
+<th:block layout:fragment="content">
+<!--<style>-->
+<!--    body{-->
+<!--        padding: 70px;-->
+<!--    }-->
+<!--</style>-->
+<body>
+<div class="container">
+    <form class="input-group" id="searchForm" action="/board/list" method="get">
+        <input type="hidden" name="page" th:value="0">
+        <select name="searchType" class="form-select">
+            <option value="">전체</option>
+            <option value="title" th:selected="${searchType == 'title'}">제목</option>
+            <option value="texts" th:selected="${searchType == 'texts'}">내용</option>
+            <option value="email" th:selected="${searchType == 'writer'}">작성자</option>
+        </select>
+        <input type="search" name="keyword" class="form-control rounded" placeholder="검색어를 입력하세요." onkeyup="enterkey();" th:value="${keyword}"/>
+        <button type="submit" class="btn btn-outline-primary" >검색</button>
+    </form>
+
+    <table class="table table">
+        <thead>
+            <tr>
+                <th class="text-center">번호</th>
+                <th class="text-center">처리 상태</th>
+                <th class="text-center">제목</th>
+                <th class="text-center">작성자</th>
+                <th class="text-center">작성일</th>
+                <th class="text-center">상세보기</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${contents != null}" th:each="content: ${contents}">
+                <td class="text-center" th:text="${content.idx}"></td>
+                <td th:text="${contentType.get(content.contentCode)}"></td>
+                <td th:text="${content.title}"></td>
+                <td th:text="${content.writer}"></td>
+                <td th:text="${content.registerDate}"></td>
+                <td class="text-center"> <button class="btn-secondary" th:onclick="|location.href='@{/board/view/}'+${content.idx}|" style="height:40px;">상세보기</button> </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <span th:if="${#lists.size(contents.content) > 0}">전체 [[${contents.totalElements}]]개 중 [[${#lists.size(contents.content)}]]개</span>
+    <nav aria-label="Page navigation-sm" th:if="${#lists.size(contents.content) > 0}">
+        <ul class="pagination justify-content-center">
+            <li th:class="'page-item '+ ${nowPage == 1? 'disabled':''}">
+                <a class="page-link" th:href="@{/board/list(page=${nowPage-2},searchType=${searchType},keyword=${keyword})}" tabindex="-1"> < </a>
+            </li>
+            <th:block th:each="page:${#numbers.sequence(startPage,endPage)}">
+                <li th:class="'page-item ' + ${page == nowPage ? 'active': ''}"><a class="page-link" th:href="@{/board/list(page=${page-1},searchType=${searchType},keyword=${keyword})}">[[${page}]]</a></li>
+            </th:block>
+            <li th:class="'page-item '+ ${nowPage == endPage? 'disabled':''}">
+                <a class="page-link" th:href="@{/board/list(page=${nowPage},searchType=${searchType},keyword=${keyword})}"> > </a>
+            </li>
+        </ul>
+    </nav>
+    <div th:if="${#lists.size(contents.content) == 0}">
+        <h4 class="text-center" > 검색된 결과가 없습니다. </h4>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    $(document).ready(function(){
+
+    });
+    function enterkey() {
+        if (window.keyCode === 13) {
+            $("#searchForm").submit();
+        }
+    }
+</script>
+</th:block>

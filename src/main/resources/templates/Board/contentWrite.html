@@ -1,0 +1,93 @@
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout" >
+<th:block layout:fragment="content">
+<!--<style>-->
+<!--    body{-->
+<!--        padding-top: 70px; padding-bottom: 30px;-->
+<!--    }-->
+<!--</style>-->
+<body>
+<div class="container" >
+    <div class="form-group">
+        <div class="mb-3">
+            <label for="title">글 제목 : </label>
+            <input type="text" id="title" class="form-control" th:value="${content?.title}" placeholder="제목을 입력하세요" width="400px">
+        </div>
+        <div class="mb-3">
+            <label for="writer">작성자 : </label>
+            <input type="text" id="writer" class="form-control" th:value="${content?.writer}" placeholder="작성자를 입력하세요" width="200px">
+        </div>
+        <div class="mb-3">
+            <label for="phone">휴대폰 번호 : </label>
+            <input type="text" id="phone" class="form-control" th:value="${content?.phoneNumber}" placeholder="휴대폰 번호를 입력하세요." width="200px">
+        </div>
+        <div class="mb-3">
+            <label for="email">이메일 주소 : </label>
+            <input type="text" id="email" class="form-control" th:value="${content?.email}" placeholder="이메일 주소를 입력하세요." width="200px">
+        </div>
+        <div class="mb-3">
+            <label for="contentType">게시글 분류 : </label>
+            <select id="contentType" class="form-select" >
+                <option th:each="type : ${contentType}" th:value="${type.key}">[[${type.value}]]</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="texts">글 내용 : </label>
+            <textarea class="form-control" id="texts" rows="5" >[[${content?.texts}]]</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="contentFile">파일첨부</label>
+            <input type="file" class="form-control" id="contentFile" />
+        </div>
+    </div>
+
+    <a href="/" role="button" class="btn btn-secondary">취소</a>
+    <button type="button" class="btn btn-primary" th:data-idx="${content==null?0:content.idx}" onclick="dataSend(this);">제출</button>
+</div>
+
+</body>
+
+<script>
+    $(document).ready(function(){
+
+    });
+    function dataSend(obj) {
+
+        let file=$("#contentFile");
+
+        let content = {
+            idx: $(obj).data('idx'),
+            title: $('#title').val(),
+            writer: $("#writer").val(),
+            texts: $("#texts").val(),
+            phoneNumber: $("#phone").val(),
+            email: $('#email').val(),
+            contentCode: $("#contentType").val()
+        };
+
+        let formData = new FormData();
+        formData.append("file", file[0].files[0]);
+        formData.append("data", new Blob([JSON.stringify(content)],{type:"application/json"}));
+
+        $.ajax({
+            url: "/board/write",
+            data: formData,
+            type: "POST",
+            contentType: false,
+            processData: false,
+            success: function (result) {
+                let resultData = JSON.parse(result);
+                if(resultData.result == "success"){
+                    alert("등록 성공했습니다.");
+                    location.href = "/";
+                }else{
+                    alert("등록 실패했습니다. 오류 문구 : " + result.msg);
+                }
+            }
+        });
+    }
+
+
+</script>
+</th:block>

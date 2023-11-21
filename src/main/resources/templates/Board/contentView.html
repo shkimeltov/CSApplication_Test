@@ -1,0 +1,82 @@
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout" >
+<th:block layout:fragment="content">
+<!--<style>-->
+<!--    body{-->
+<!--        padding: 70px;-->
+<!--    }-->
+<!--</style>-->
+<body>
+<div class="container">
+        <h1>상세보기</h1>
+        <div class="row row1">
+            <table class="table">
+                <tr>
+                    <th width=20% class="text-center warning">번호</th>
+                    <td width=30% class="text-center">[[${content.idx}]]</td>
+                    <th width=20% class="text-center warning">작성일</th>
+                    <td width=30% class="text-center">[[${content.registerDate}]]</td>
+                </tr>
+                <tr>
+                    <th width=20% class="text-center warning">작성자</th>
+                    <td width=30% class="text-center">[[${content.writer}]]</td>
+                    <th width=20% class="text-center warning">처리상태</th>
+                    <td width=30% class="text-center">[[${contentType.get(content.contentCode)}]]</td>
+                </tr>
+                <tr>
+                    <th width=20% class="text-center warning">이메일</th>
+                    <td width=30% class="text-center">[[${content.email}]]</td>
+                    <th width=20% class="text-center warning">휴대폰 번호</th>
+                    <td width=30% class="text-center">[[${content.phoneNumber}]]</td>
+                </tr>
+                <tr>
+                    <th width=20% class="text-center warning">제목</th>
+                    <td colspan="3">[[${content.title}]]</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-left" valign="top" height="200">
+                        <pre style="white-space: pre-wrap;border:none;background-color: white;">[[${content.texts}]]</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right">
+                        <button type="button" class ="btn btn-xs btn-info" th:onclick="|location.href='@{/board/write/}'+${content.idx}|" >수정</button>
+                        <button type="button" class="btn btn-xs btn-info" th:data-idx="${content.idx}" onclick="deleteContent(this)">삭제</button>
+                        <button type="button" class="btn btn-xs btn-info" th:onclick="|location.href='@{/board/list}'|">목록</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+</div>
+</body>
+
+<script>
+    $(document).ready(function(){
+
+    });
+
+    function deleteContent(obj) {
+        if(!confirm('삭제하시겠습니까?')){
+            return;
+        }
+        let idx = $(obj).data('idx');
+
+        $.ajax({
+            url: "/board/delete",
+            data: {idx : idx},
+            type: "POST",
+            success: function (result) {
+                let resultData = JSON.parse(result);
+                if(resultData.result == "success"){
+                    alert("삭제했습니다.");
+                    location.href = "/board/list";
+                }else{
+                    alert("등록 실패했습니다. 오류 문구 : " + result.msg);
+                }
+            }
+        });
+    }
+
+
+</script>
+</th:block>

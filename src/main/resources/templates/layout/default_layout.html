@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="fragments/head :: headFragment"/>
+<body>
+        <th:block th:replace="fragments/header :: headerFragment('Header')"></th:block>
+        <div class="container-fluid">
+            <div class="row">
+                <th:block th:replace="fragments/left :: leftFragment"></th:block>
+                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+                    <th:block layout:fragment="content"></th:block>
+                </main>
+            </div>
+        </div>
+    <th:block th:replace="fragments/footer :: footerFragment"></th:block>
+</body>
+</html>
