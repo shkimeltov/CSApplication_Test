@@ -19,14 +19,14 @@
 <body class="text-center">
     <h3>관리자 로그인</h3>
     <main class="form-signin">
-        <form>
+        <div>
             <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
+                <input type="memberId" class="form-control" id="memberId" placeholder="아이디를 입력해주세요.">
+                <label for="memberId">memberId</label>
             </div>
             <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                <label for="floatingPassword">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력해주세요." onkeypress="if(event.keyCode==13){memberLogin();}">
+                <label for="password">Password</label>
             </div>
 
             <div class="checkbox mb-3">
@@ -34,9 +34,10 @@
                     <input type="checkbox" value="remember-me"> Remember me
                 </label>
             </div>
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-        </form>
+            <button class="w-100 btn btn-lg btn-primary" type="button" onclick="memberLogin();">Sign in</button>
+        </div>
     </main>
+
 
 
 
@@ -45,4 +46,54 @@
 <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
 <script>
 
+    // let bodyData = new FormData();
+    // bodyData.append("to", "shkim11@eltov.com");
+    // bodyData.append("user_id", "shkim11");
+    // bodyData.append("cc", "");
+    // bodyData.append("bcc", "");
+    // bodyData.append("subject", "메일 제목");
+    // bodyData.append("content", "내용");
+    // bodyData.append("save_sent_mail", "N");
+    //
+    // $(document).ready(function() {
+    //     fetch("https://api.hiworks.com/office/v2/webmail/sendMail", {
+    //         method: "POST",
+    //         crossDomain: true,
+    //         headers: {
+    //             "Authorization": "Bearer a35fafcc15de3599a1fe91bde803634e"
+    //         },
+    //         body: bodyData,
+    //     }).then((response) => console.log(response));
+    //
+    // });
+
+    function memberLogin(){
+        let memberId = $('#memberId').val();
+        let passwordChk = $('#password').val();
+
+
+        $.ajax({
+            url: "/member/login",
+            data: {
+                memberId: memberId,
+                passwordChk: passwordChk
+            },
+            type: "POST",
+            success: function (result) {
+                let resultData = JSON.parse(result);
+                if(resultData.result == "success"){
+                    alert("로그인 성공했습니다.");
+                    location.href="/board/list";
+                }else{
+                    alert("로그인 실패했습니다. 오류 문구 : " + result.msg);
+                    return;
+                }
+            }
+        });
+    }
+    function enterkey() {
+        if (window.keyCode === 13) {
+            memberLogin();
+        }
+    }
 </script>

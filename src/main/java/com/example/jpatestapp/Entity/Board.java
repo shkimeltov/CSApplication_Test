@@ -43,4 +43,7 @@ public class Board {
     @Column(nullable = false)
     private String deleteYn = "N";
 
+    @Column(nullable = false)
+    private String status = "W";
+
 }

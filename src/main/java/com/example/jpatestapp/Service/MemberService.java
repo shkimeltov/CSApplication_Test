@@ -1,34 +1,55 @@
 package com.example.jpatestapp.Service;
 
+import com.example.jpatestapp.Controller.BoardSpecification;
+import com.example.jpatestapp.Entity.Board;
 import com.example.jpatestapp.Entity.Member;
 import com.example.jpatestapp.Repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepository userRepository;
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    /**
-     * 새로운 사용자를 생성하고, 생성된 사용자를 반환.
-     * param : user 새로 생성할 사용자 정보
-     * return : 생성된 사용자 정보
-     */
-    public Member createUser(Member user) {
-        return userRepository.save(user);
+    public Member registMember(Member member) {
+        LocalDateTime now = LocalDateTime.now();
+        String formattedDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        member.setRegisterDate(formattedDate);
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        return memberRepository.save(member);
     }
 
-    /**
-     * 주어진 사용자명(username)에 해당하는 사용자 정보를 조회.
-     * param : username 조회할 사용자명
-     * return 사용자 정보가 존재하는 경우 해당 정보를, 그렇지 않은 경우 null을 반환.
-     */
-    public Optional<Member> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Member findByMemberId(String memberId){
+        return memberRepository.findByMemberId(memberId);
     }
 
+    public void updateLoginDate(Member member){
+        LocalDateTime now = LocalDateTime.now();
+        String formattedDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        member.setLastLoginDate(formattedDate);
+        memberRepository.save(member);
+    }
+
+    public Page<Member> getAllContents(Pageable pageable) {
+        return memberRepository.findAll(pageable);
+    }
+
+
+    public boolean checkPassword(String password, String passwordChk) {
+        if(password.equals(passwordEncoder.encode(passwordChk))){
+            return true;
+        }
+        return false;
+    }
 }

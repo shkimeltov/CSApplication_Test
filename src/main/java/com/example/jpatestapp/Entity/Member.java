@@ -13,8 +13,22 @@ public class Member {
     private Long idx;
 
     @Column(nullable = false, unique = true)
-    private String username;
-
+    private String memberName;
+    @Column(nullable = false, unique = true)
+    private String memberId;
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String registerDate;
+
+    @Column(nullable = true)
+    private String lastLoginDate;
+
+    @Column(nullable = false)
+    private String authType;    //general, super
+
 }

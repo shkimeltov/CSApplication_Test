@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-application-test
+  labels:
+    app: cs-application-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-application-test
+  template:
+    metadata:
+      labels:
+        app: cs-application-test
+    spec:
+      containers:
+        - name: cs-application-test
+          image: docker.io/shkim11/cs-application-test
+          ports:
+            - containerPort: 8080

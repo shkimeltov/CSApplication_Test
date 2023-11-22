@@ -43,6 +43,7 @@ public class BoardController {
         model.addAttribute("contents", contentList);
         StaticValue staticValue = new StaticValue();
         model.addAttribute("contentType", staticValue.boardStaticMap());
+        model.addAttribute("statusType", staticValue.boardStatusMap());
 
         //페이지블럭 처리
         int BAR_LENGTH = 5;
@@ -69,6 +70,7 @@ public class BoardController {
         model.addAttribute("content", boardService.getContent(idx));
         StaticValue staticValue = new StaticValue();
         model.addAttribute("contentType", staticValue.boardStaticMap());
+        model.addAttribute("statusType", staticValue.boardStatusMap());
         return "/Board/contentView";
     }
 

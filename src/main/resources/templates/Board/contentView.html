@@ -12,8 +12,8 @@
         <div class="row row1">
             <table class="table">
                 <tr>
-                    <th width=20% class="text-center warning">번호</th>
-                    <td width=30% class="text-center">[[${content.idx}]]</td>
+                    <th width=20% class="text-center warning">글 분류</th>
+                    <td width=30% class="text-center">[[${contentType.get(content.contentCode)}]]</td>
                     <th width=20% class="text-center warning">작성일</th>
                     <td width=30% class="text-center">[[${content.registerDate}]]</td>
                 </tr>
@@ -21,7 +21,7 @@
                     <th width=20% class="text-center warning">작성자</th>
                     <td width=30% class="text-center">[[${content.writer}]]</td>
                     <th width=20% class="text-center warning">처리상태</th>
-                    <td width=30% class="text-center">[[${contentType.get(content.contentCode)}]]</td>
+                    <td width=30% class="text-center">[[${statusType.get(content.status)}]]</td>
                 </tr>
                 <tr>
                     <th width=20% class="text-center warning">이메일</th>
@@ -40,7 +40,7 @@
                 </tr>
                 <tr>
                     <td colspan="4" class="text-right">
-                        <button type="button" class ="btn btn-xs btn-info" th:onclick="|location.href='@{/board/write/}'+${content.idx}|" >수정</button>
+                        <button type="button" class ="btn btn-xs btn-info" th:if="${content.status == 'W' }" th:onclick="|location.href='@{/board/write/}'+${content.idx}|" >수정</button>
                         <button type="button" class="btn btn-xs btn-info" th:data-idx="${content.idx}" onclick="deleteContent(this)">삭제</button>
                         <button type="button" class="btn btn-xs btn-info" th:onclick="|location.href='@{/board/list}'|">목록</button>
                     </td>

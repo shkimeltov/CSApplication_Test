@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @RestController
@@ -47,6 +49,9 @@ public class BoardApiController {
             }else{
                 boardService.updateContent(content.getIdx(), content);
             }
+
+            // 알림 전송
+
             jsonData.put("result", "success");
         }catch (Exception e){
             jsonData.put("result", "fail");

@@ -1,0 +1,106 @@
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout" >
+<th:block layout:fragment="member">
+    <!--<style>-->
+    <!--    body{-->
+    <!--        padding: 70px;-->
+    <!--    }-->
+    <!--</style>-->
+    <body>
+    <div class="form-group" action="/member/regist" method="post" style="width:400px;">
+        <label for="authType">관리자 권한 : </label>
+        <select id="authType" name="authType" class="form-select">
+            <option value="general">일반관리자</option>
+            <option value="super">최고관리자</option>
+        </select>
+        <label for="memberName">관리자 이름</label>
+        <input type="text" id="memberName" class="form-control rounded" name="memberName" width="200px">
+        <label for="memberId">아이디</label>
+        <input type="text" id="memberId" class="form-control rounded" name="memberId" width="200px">
+        <label for="password">비밀번호 </label>
+        <input type="password" id="password" class="form-control rounded" name="password" width="200px">
+        <label for="passwordChk">비밀번호 확인</label>
+        <input type="password" id="passwordChk" class="form-control rounded" name="passwordChk" width="200px">
+        <label for="email">이메일 주소</label>
+        <input type="text" id="email" class="form-control rounded" name="email" width="200px">
+
+        <button type="button" class="btn btn-outline-primary" onclick="registMember();"> 등록 </button>
+    </div>
+    <div class="container">
+        <table class="table table">
+            <thead>
+            <tr>
+                <th class="text-center">번호</th>
+                <th class="text-center">관리자</th>
+                <th class="text-center">아이디</th>
+                <th class="text-center">마지막 로그인 일자</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${members != null}" th:each="member: ${members}">
+                <td class="text-center" th:text="${member.idx}"></td>
+                <td th:text="${member.memberName}"></td>
+                <td th:text="${member.memberId}"></td>
+                <td th:text="${member.lastLoginDate}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <span th:if="${#members != null && lists.size(members.member) > 0}">전체 [[${members.totalElements}]]개 중 [[${#lists.size(members.member)}]]개</span>
+        <nav aria-label="Page navigation-sm" th:if="${#members != null && lists.size(members.member) > 0}">
+            <ul class="pagination justify-content-center">
+                <li th:class="'page-item '+ ${nowPage == 1? 'disabled':''}">
+                    <a class="page-link" th:href="@{/member/list(page=${nowPage-2})}" tabindex="-1"> < </a>
+                </li>
+                <th:block th:each="page:${#numbers.sequence(startPage,endPage)}">
+                    <li th:class="'page-item ' + ${page == nowPage ? 'active': ''}"><a class="page-link" th:href="@{/member/list(page=${page-1})}">[[${page}]]</a></li>
+                </th:block>
+                <li th:class="'page-item '+ ${nowPage == endPage? 'disabled':''}">
+                    <a class="page-link" th:href="@{/member/list(page=${nowPage})}"> > </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    </body>
+    <script th:inline="javascript">
+        $(document).ready(function(){
+            console.log([[${members}]]);
+        });
+
+        function registMember(){
+            let authType = $('#authType').val();
+            let memberName = $('#memberName').val();
+            let memberId = $('#memberId').val();
+            let password = $('#password').val();
+            let passwordChk = $('#passwordChk').val();
+            let email = $('#email').val();
+
+            if(password != passwordChk){alert('비밀번호 확인해주세요.'); return;}
+            if(!confirm('등록하시겠습니까?')){return;}
+
+            let member = {
+                authType : authType,
+                memberName : memberName,
+                memberId : memberId,
+                password : password,
+                email : email
+            }
+
+            $.ajax({
+                url: "/member/regist",
+                data: member,
+                type: "POST",
+                success: function (result) {
+                    let resultData = JSON.parse(result);
+                    if(resultData.result == "success"){
+                        alert("등록 성공했습니다.");
+                        location.reload();
+                    }else{
+                        alert("등록 실패했습니다. 오류 문구 : " + result.msg);
+                    }
+                }
+            });
+
+        }
+    </script>
+</th:block>

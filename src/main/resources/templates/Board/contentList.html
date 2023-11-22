@@ -16,7 +16,7 @@
             <option value="texts" th:selected="${searchType == 'texts'}">내용</option>
             <option value="email" th:selected="${searchType == 'writer'}">작성자</option>
         </select>
-        <input type="search" name="keyword" class="form-control rounded" placeholder="검색어를 입력하세요." onkeyup="enterkey();" th:value="${keyword}"/>
+        <input type="search" name="keyword" class="form-control rounded" placeholder="검색어를 입력하세요." onkeyup="enterKey();" th:value="${keyword}"/>
         <button type="submit" class="btn btn-outline-primary" >검색</button>
     </form>
 
@@ -34,7 +34,11 @@
         <tbody>
             <tr th:if="${contents != null}" th:each="content: ${contents}">
                 <td class="text-center" th:text="${content.idx}"></td>
-                <td th:text="${contentType.get(content.contentCode)}"></td>
+                <td>
+                    <select id="statusType" class="form-select" >
+                        <option th:each="status : ${statusType}" th:status="${status.key}" th:selected="${status.key == content.status}">[[${status.value}]]</option>
+                    </select>
+                </td>
                 <td th:text="${content.title}"></td>
                 <td th:text="${content.writer}"></td>
                 <td th:text="${content.registerDate}"></td>
@@ -43,8 +47,8 @@
         </tbody>
     </table>
 
-    <span th:if="${#lists.size(contents.content) > 0}">전체 [[${contents.totalElements}]]개 중 [[${#lists.size(contents.content)}]]개</span>
-    <nav aria-label="Page navigation-sm" th:if="${#lists.size(contents.content) > 0}">
+    <span th:if="${#contents != null && lists.size(contents.content) > 0}">전체 [[${contents.totalElements}]]개 중 [[${#lists.size(contents.content)}]]개</span>
+    <nav aria-label="Page navigation-sm" th:if="${#contents != null && lists.size(contents.content) > 0}">
         <ul class="pagination justify-content-center">
             <li th:class="'page-item '+ ${nowPage == 1? 'disabled':''}">
                 <a class="page-link" th:href="@{/board/list(page=${nowPage-2},searchType=${searchType},keyword=${keyword})}" tabindex="-1"> < </a>
@@ -66,7 +70,7 @@
     $(document).ready(function(){
 
     });
-    function enterkey() {
+    function enterKey() {
         if (window.keyCode === 13) {
             $("#searchForm").submit();
         }
