@@ -58,7 +58,7 @@ public class MemberController {
         if(session != null && session.getAttribute("loginId") != null){
             session.invalidate();
         }
-        return "/Member/memberLogin";
+        return "Member/memberLogin";
     }
 
 }

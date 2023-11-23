@@ -32,7 +32,7 @@ public class BoardController {
         }
         StaticValue staticValue = new StaticValue();
         model.addAttribute("contentType", staticValue.boardStaticMap());
-        return "/Board/contentWrite";
+        return "Board/contentWrite";
     }
 
     @GetMapping("/list")
@@ -62,7 +62,7 @@ public class BoardController {
         //검색 관련 값 전달
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
-        return "/Board/contentList";
+        return "Board/contentList";
     }
 
     @GetMapping("/view/{idx}")
@@ -71,7 +71,7 @@ public class BoardController {
         StaticValue staticValue = new StaticValue();
         model.addAttribute("contentType", staticValue.boardStaticMap());
         model.addAttribute("statusType", staticValue.boardStatusMap());
-        return "/Board/contentView";
+        return "Board/contentView";
     }
 
 
