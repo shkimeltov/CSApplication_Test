@@ -26,7 +26,7 @@ public class MemberController {
 
     @GetMapping("/login")
     public String Login(){
-        return "/Member/memberLogin";
+        return "Member/memberLogin";
     }
 
     @GetMapping("/list")
