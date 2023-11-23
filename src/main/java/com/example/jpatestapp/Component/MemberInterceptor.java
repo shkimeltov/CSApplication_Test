@@ -15,7 +15,7 @@ public class MemberInterceptor implements HandlerInterceptor {
             = Arrays.asList("");
 
     public List loginInessential
-            = Arrays.asList("/member/login","/","","/css/**", "/js/**", "/member/logout");
+            = Arrays.asList("/member/login","/","","/css/**", "/js/**", "/member/logout", "/board/write", "/board/delete");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
